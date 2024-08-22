@@ -1,52 +1,57 @@
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.pipeline import make_pipeline
-from sklearn.metrics import classification_report, accuracy_score
-from utilities import load_small_dataset
-import time
-from sklearn.model_selection import cross_val_score
+from utilities import analyze_twitter_comments, plot_sentiments, get_tweet_v2, mock_get_tweet_v2, calculate_overall_sentiment
+import os
+import tweepy
+from unittest.mock import patch
+from transformers import pipeline
+
+
+# os.environ['TWITTER_BEARER_TOKEN'] = 'AAAAAAAAAAAAAAAAAAAAAP12vQEAAAAA2lxRNQejqdJJMm8gvyCRVKureBY%3D8TmPHHrKC8LB7SiRoW5FJuwNmCbGBHrZJqZCb3J9EHpYNw9kxk'
+# TWITTER_BEARER_TOKEN = os.getenv('TWITTER_BEARER_TOKEN')
 
 
 def main():
-    """Start Timer"""
-    start_time = time.time()
-    print("Starting time...")
+    # """API keys"""
+    # api_key = 'api_key'
+    # api_key_secret = 'api_secret_key'
+    #
+    # """Access token"""
+    # access_token = 'access_token'
+    # access_token_secret = 'access_secret_token'
+    #
+    # """Authenticate with twitter"""
+    # auth = tweepy.OAuthHandler(api_key, api_key_secret)
+    # auth.set_access_token(access_token, access_token_secret)
+    # api = tweepy.API(auth)
 
-    # Load data
-    df = load_small_dataset()
+    """CODE BELOW IS MENAT FOR TEST TWEETS"""
+    # Create a test tweet
+    # test_tweet = api.update_status('This is a test tweet for sentiment analysis')
 
-    # Split data
-    x = df['text']
-    y = df['sentiment']
+    # Get tweet id
+    tweet_id = '1234567890'
 
-    # Create a pipeline with a vectorizer and a classifier
-    model = make_pipeline(
-        CountVectorizer(),
-        MultinomialNB()
-    )
+    # Simulate the response data for the test tweet
+    tweet_data = mock_get_tweet_v2(tweet_id, None)
 
-    # Perform cross-validation
-    cv_scores = cross_val_score(model, x, y, cv=5, scoring='accuracy')
-    print("Cross-Validation Scores:", cv_scores)
-    print("Mean Accuracy:", cv_scores.mean())
-    print("Standard Deviation of Accuracy:", cv_scores.std())
+    # Access tweet content and username
+    tweet_text = tweet_data['data']['text']
+    username = tweet_data['includes']['users'][0]['username']
 
-    # Train the model on the full dataset and evaluate
-    x_test, x_train, y_test, y_train = train_test_split(x, y, test_size=0.2, random_state=42)
-    model.fit(x_train, y_train)
+    # Simulate replies
+    replies = [
+        "I think this is great!",
+        "Not a fan of this tweet.",
+        "It's okay, could be better.",
+    ]
 
-    # Predict on the test set
-    y_pred = model.predict(x_test)
+    # Analyze the sentiment of the replies
+    sentiment_analysis = pipeline("sentiment-analysis", model="cardiffnlp/twitter-roberta-base-sentiment-latest")
 
-    # Evaluate the model
-    print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
-    print("Classification Report:\n", classification_report(y_test, y_pred))
-
-    """End Timer"""
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Total time taken: {elapsed_time:.2f} seconds")
+    results = []
+    for reply in replies:
+        results.append(sentiment_analysis(reply))
+        print(sentiment_analysis(reply))
+    plot_sentiments(results)
 
 
 if __name__ == '__main__':
