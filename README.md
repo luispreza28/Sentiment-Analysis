@@ -25,6 +25,7 @@ This project performs sentiment analysis on Twitter data, focusing on user comme
 - nltk: For natural language processing tasks.
 
 ## Requirements File:
+
 - pandas==2.1.0
 - scikit-learn==1.3.0
 - datasets==2.8.0
@@ -77,11 +78,14 @@ In order to fetch real-time tweets and replies, you need to configure your Twitt
 3. Replace the placeholder values in the utilities.py with your actual API credentials:
 
 api_key = 'your_api_key'
+
 api_key_secret = 'your_api_secret'
+
 access_token = 'your_access_token'
+
 access_token_secret = 'your_access_token_secret'
 
-Alternatively, set these as environment variables in your system or use the os module to access them securely.
+### Alternatively, set these as environment variables in your system or use the os module to access them securely.
 
 #### Example Output
 Upon running the project, you'll see the sentiment analysis results displayed as a bar chart:
